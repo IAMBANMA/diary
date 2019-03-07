@@ -376,6 +376,46 @@
 
   当然,github允许你添加多个key.假定你有若干电脑,你一会儿在公司提交,一会儿在家里提交,只要把每台电脑的key都添加到github,就可以在每台电脑上往github推送了.  
 
+## 添加远程库  
+  现在的情境是,你已经在本地创建了一个Git仓库,又想在github创建一个Git仓库,并且让这两个仓库进行远程同步,这样,github上的仓库既可以作为备份,又可以让其他人通过该仓库来协作. 
+  
+  首先,登录github,然后,找到"create a new repo"按钮,创建一个新的仓库.  
+  在repository name填入git,其他保持默认设置,点击"create repository"按钮,就成功地创建了一个新的git仓库.  
+  目前,在github上的这个git仓库还是空的,github告诉我们,可以从这个仓库克隆出新的仓库,也可以把一个已有的本地仓库与之关联,然后,把本地仓库的内容推送到github仓库.  
+  ```
+  $ git remote add origin git@github.com:IAMBANMA/git.git  
+  ```
+  添加后,远程库的名字就是`origin`,这是Git默认的叫法,也可以改成别的,但是`origin`这个名字一看就知道是远程库.  
+  下一步,就可以把本地库所有的内容推送到远程库上:  
+  ```
+  $ git push -u origin master  
+  counting objects: 20, done.  
+  delta compression using up to 4 threads.  
+  Compressing objects: 100% (15/15), done.  
+  Writing objects: 100% (20/20), 1.64 KiB | 560.00 KiB/s, done.  
+  Total 20 (delta 5), reused 0 (delta 0)  
+  remote: Resolving deltas: 100% (5/5), done.  
+  To github.com:michaelliao/learngit.git  
+    *[new branch]      master -> master  
+  Branch 'master' set up to track remote branch 'master' from 'origin'.  
+  ```
+  把本地库的内容推送到远程,用`git push`命令,实际上是吧当前分支`master`推送到远程.  
 
+  由于远程库是空的,我们第一次推送`master`分支时,加上了`-u`参数,git不但会把本地的`master`分支内容推送到远程新的`master`分支,还会把本地的`master`分支和远程的`master`分支关联起来,在以后的推送和拉取时就可以简化命令.  
+  推送成功后,可以立刻在github页面中看到远程库的内容已经和本地一模一样.  
+  从现在起,只要本地做了提交,就可以通过命名`git push origin master`把本地`master`分支的最新修改推送至github,现在,你就拥有了真正的分布式版本库!  
+
+## SSH警告  
+  当你第一次使用git的`clone`或者`push`命令链接github时,会得到一个警告:  
+  ```
+  The authenticity of host 'github.com (xx.xx.xx.xx)' can't be established.  
+  RSA key fingerprint is xx.xx.xx.xx.xx.  
+  Are you sure you want to continue connecting (yes/no)?  
+  ```
+  这是因为git使用ssh连接,而ssh连接在第一次验证github服务器的key时,需要你确认github的key的指纹信息是否真的来自github的服务器,输入`yes`回车即可.  
+  git会输出一个警告,告诉你已经把github的key添加到本机的一个信任列表里了:  
+  ```
+  warning permanently added 'github.com' (rsa) to the list of know hosts.  
+  ```
 
 
