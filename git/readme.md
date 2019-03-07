@@ -111,7 +111,7 @@
 
   虽然git告诉我们`readme.txt`被修改了,但如果能看看具体修改了什么内容,自然是很好的.比如你休假两周从国外回来,第一天上班时,已经记不清上次怎么修改的`readme.txt`,所以,需要用`git diff`这个命令看看:  
   ```
-  $git diff readme.txt  
+  $ git diff readme.txt  
   diff --git a/readme.txt b/readme.txt  
   index 46d49bf..9247db6 100644  
   --- a/readme.txt  
@@ -122,13 +122,14 @@
    git is free software.  
   ```  
   `git diff`顾名思义就是查看difference,显示的格式正是Unix通用的diff格式,可以从上面的命令输出看到,我们在第一行添加了一个`distributed`单词.  
-  知道了对`readme.txt`做了什么修改后,再把它提交到仓库就放心多了,提交修改和提交新文件是一样的两步,第一步是`git add`:
+  知道了对`readme.txt`做了什么修改后,再把它提交到仓库就放心多了,提交修改和提交新文件是一样的两步,第一步是`git add`:  
+
   ```
   $ git add readme.txt  
   ```
   同样没有任何输出.在执行第二步`git commit`之前,我们再运行`git status`看看仓库当前的状态:  
   ```
-  $git status  
+  $ git status  
   on branch master  
   changes to be committed:  
     (use "git reset head <file>..." to unstage)  
@@ -237,13 +238,14 @@
   现在,你回退到了某个版本,第二天又想回到最新的版本,怎么办呢?  
   在git中,总是有后悔药可以吃的.当你用`$git reset --hard HEAD^`回退到`add distributed`版本时,再想恢复到`append gpl`,就必须找到`append gpl`的commit id.  
   git提供了一个命令`git reflog`用来记录你的每一次命令:  
+
   ```
   $ git reflog  
   e475afc HEAD@{1}: reset: moving to HEAD^  
   1094adb (HEAD -> master) HEAD@{2}: commit: append GPL  
   e475afc HEAD@{3}: commit: add distributed  
   eaadf4e HEAD@{4}: commit (initial): wrote a readme file  
-  ``
+  ```
 
 ### 小结  
   * `HEAD`指向的版本就是当前版本,因此,git允许我们在版本的历史之间穿梭,使用命令`git reset --hard commit_id`.  
