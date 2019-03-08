@@ -417,5 +417,129 @@
   ```
   warning permanently added 'github.com' (rsa) to the list of know hosts.  
   ```
+  这个警告只会出现一次,后面的操作就不会再有任何警告啦.  
+
+## 小结  
+  要关联一个远程库,使用命名`git remote add origin git@server-name:path/repo-name.git`;  
+  关联后,使用命令`git push -u origin master`第一次推送master分支的所有内容;  
+  此后,每次本地提交后,只要有必要,就可以使用命令`git push origin master`推送最新修改.  
+
+## 从远程库克隆  
+  现在,假设我们从零开发,那么最好的方式是先创建远程库,然后,从远程库克隆.  
+  首先,登录github,创建一个新的仓库,名字叫`gitskills`.  
+  我们勾选`initialize this repository with a readme`,这样github会自动为我们创建`readme.md`文件.现在,远程库已经准备好了,下一步是用命令`git clone`克隆一个本地库.  
+  ```
+  $ git clone git@github.com:IAMBANMA/gitskills.git  
+  cloning into 'gitskills'...  
+  remote: counting objects: 3 done.  
+  remote: total 3 (delta 0), reused 0 (delta 0),pack-reused 3  
+  receiving objects; 100% (3/3), done.  
+  ```
+  然后进入`gitskills`目录,已经有`readme.md`文件了.  
+  ```
+  $ cd gitskills  
+  $ ls  
+  readme.md  
+  ```
+  如果有多个人协作开发,那么每个人各自从远程克隆一份就可以啦.  
+
+  你也许还注意到,github给出的地址不止一个,还可以用`https://github.com/IAMBANMA/gitskills.git`这样的地址.实际上,git支持多种协议,默认的`git://`使用ssh,但也可以使用`HTTPS`等其他协议.  
+  使用`HTTPS`除了速度慢以外,还有个最大的麻烦是每次推送都必须输入口令,但是在某些只开放http端口的公司内部就无法使用`ssh`协议而只能用`https`.  
+
+## 小结  
+  要克隆一个仓库,首先必须知道仓库的地址,然后使用`git clone`命令克隆.  
+  git支持多种协议,包括`https`,但通过`ssh`支持的原生`git`协议速度最快.  
+
+## 分支管理  
+  分支在实际中有什么用呢?假设你准备开发一个新功能,但是需要两周才能完成,第一周你写了50%的代码,如果立刻提交,由于代码还没写完,不完整的代码库会导致别人不能干活了.如果等代码全部写完一次性提交,又存在丢失每天进度的巨大风险.  
+
+  现在有了分支,就不用怕了.你创建了一个属于你自己的分支,别人看不到,还继续在原来的分支上正常工作,而你在自己的分支上干活,想提交就提交,直到开发完毕后,再一次性合并到原来的分支上,这样既安全有不影响别人工作.  
+
+## 创建与合并分支  
+  首先,我们创建`dev`分支,然后切换到`dev`分支:  
+  ```
+  $ git checkout -b dev  
+  switched to a new branch 'dev'  
+  ```
+  `git checkout`命令加上`-b`参数表示创建并切换,相当于以下两条命令:  
+  ```
+  $ git branch dev  
+  $ git checkout dev  
+  switched to branch 'dev'  
+  ```
+  然后,用`git branch`命令查看当前分支:  
+  ```
+  $ git branch  
+  *dev  
+   master  
+  ```
+  `git branch`命令会列出所有分支,当前分支前面会标一个`*`号.  
+  然后,我们就可以在`dev`分支上正常提交,比如对readme.txt做个修改,然后提交:  
+  ```
+  $ git add readme.txt  
+  $ git commit -m 'branch test'  
+  [dev b12d20e] branch test  
+   1 file changed, 1 insertion(+)  
+  ```
+  现在,`dev`分支的工作完成,我们可以切回到`master`分支:  
+  ```
+  $ git checkout master  
+  switched to branch 'master'  
+  ```
+  切回master分支后,查看readme.txt文件,刚才添加的内容不见了!因为那个提交是在`dev`分支上,而`master`分支此刻的提交点并没有变.  
+  现在,我们把`dev`分支的工作成果合并到`master`分支上.  
+  ```
+  $ git merge dev  
+  updating kdkf757..j3n4n5nn  
+  fast-forward  
+    readme.txt | 1 +  
+    1 file changed, 1 insertion(+)  
+  ```
+  `git merge`命令用于合并指定分支到当前分支.合并后,再查看readme.txt文件的内容,可以看到,和`dev`分支的最新提交是完全一样的.  
+  注意到上面的`fast-forward`信息,git告诉我们,这次合并是"快进模式",也就是直接把`master`指向`dev`的当前提交,所以合并速度非常快.  
+  当然,也不是每次合并都能`fast-forward`,后面我们会讲其他合并的方式.  
+  
+  合并完成后,就可以放心地删除`dev`分支了:  
+  ```
+  $ git branch -d dev  
+  deleted branch dev (was b17d20e)  
+  ```
+  删除后,查看`branch`,就只剩下`master`分支了:  
+  ```
+  $ git branch  
+  *master  
+  ```
+  因为创建,合并和删除分支非常快,所以Git鼓励你使用分支完成某个任务,合并后再删除分支,这和直接在`master`分支上工作效果是一样的,但过程更安全.  
+
+## 小结  
+  git鼓励大量使用分支:  
+  查看分支: `git branch`  
+  创建分支: `git branch <name>`  
+  切换分支: `git checkout <name>`  
+  创建+切换分支: `git checkout -b <name>`  
+  合并某分支到当前分支: `git merge <name>`  
+  删除分支: `git branch -d <name>`  
+
+## 解决冲突  
+  现在我们创建新的分支`feature1`,继续我们的新分支开发:
+  ```
+  $ git checkout -b feature1  
+  switched to a new branch 'feature1'  
+  ```
+  修改`readme.txt`文件后,在`feature1`分支上提交,然后切换到`master`分支.
+  git会自动提示我们当前`master`分支比远程的`master`分支超前一个提交.
+  在`master`分支上,我们再次修改`readme.txt`文件,然后提交.
+
+  现在,`master`分支和`feature1`分支各式都分别有新的提交,这种情况下,git无法执行'快速合并',只能试图把各自的修改合并起来,但这种合并可能会有冲突.
+  当冲突发生,git会告诉我们,readme.txt文件存在冲突,必须手动解决冲突后再提交.`git status`也可以告诉我们冲突的文件.  
+  解决冲突后,提交.用带参数的`git log`也可以看到分支合并的情况.  
+  `git log --graph --pretty=oneline --abbrev-commit`  
+  最后,删除`feature1`分支,工作完成.  
+
+## 小结  
+  当git无法自动合并分支时,就必须首先解决冲突.解决冲突后,再提交,合并完成.  
+  解决冲突就是把git合并失败的文件手动编辑为我们希望的内容,再提交.  
+  用`git log --graph`命令可以看到分支合并图.  
+
 
 
