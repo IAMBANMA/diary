@@ -541,5 +541,66 @@
   解决冲突就是把git合并失败的文件手动编辑为我们希望的内容,再提交.  
   用`git log --graph`命令可以看到分支合并图.  
 
+##分支管理策略  
+  通常,合并分支时,如果可能,git会用`fast forward`模式,但这种模式下,删除分支后,会丢掉分支信息.  
+  如果要强制禁用`fast forward`模式,git就会在merge时生成一个新的commit,这样,从分支历史上就可以看出分支信息.  
+  要禁用`fast forward`,要使用`git merge --no-ff`命令.下面我们实战下:  
+  首先,创建并切换`dev`分支`git checkout -b dev`,修改readme.txt文件,并提交一个新的commit.  
+  ```
+  $ git add readme.txt  
+  $ git commit -m 'add merge'  
+  ```
+  现在我们使用命令`git checkout master`切回master分支,准备合并,使用`git merge --no-ff -m 'merge with no-ff' dev`命令.注意`--no-ff`参数,表示禁用`fast forward`.  
+  因为这次合并要创建一个新的commit,所以加上`-m`参数,把commit描述写进去.
+  现在使用`git log`命令查看分支历史,发现不适用`fast forward`模式的合并,确实生成了一个新的commit.  
 
+## 分支策略  
+  在实际开发中,我们应该按照几个基本原则进行分支管理:  
+  首先,`master`分支应该是非常稳定的,也就是仅仅用来发布新版本,平时不能在上面干活;  
+  那在哪干活呢?干活都在`dev`分支上,也就是说,`dev`分支是不稳定的,到某个时候,比如1.0版本发布时,再把`dev`分支合并到`master`上,在`master`分支发布1.0版本;  
+  你和你的小伙伴们每个人都在`dev`分支上干活,每个人都有自己的分支,时不时往`dev`分支上合并就可以啦.  
+
+## 小结  
+  git分支十分强大,在团队开发中应该充分应用.  
+  合并分支时,加上`--no-ff`参数就可以用普通模式合并,合并后的历史有分支,能看出来曾经做过合并,而`fast forward`合并就看不出曾经做过合并.  
+
+## bug分支  
+  软件开发中,bug就像家常便饭一样.有了bug就需要修复,在git中,由于分支是如此的强大,所以,每个bug都可以通过一个新的临时分支来修复,修复后,合并分支,然后将临时分支删除.  
+
+  当你接到一个修复一个代号101的bug任务时,很自然,你想创建一个`issue-101`来修复它,但是,等等,当前正在`dev`上进行的工作还没有提交.  
+  并不是你不想提交,而是工作只进行到一半,还没发提交,但你有必须优先修复bug,怎么办?  
+  幸好,git还提供了一个`stash`功能,可以把当前工作现场'储藏'起来,等以后恢复现场后继续工作.  
+  ```
+  $ git stash  
+  saved working directory and index state wip on dev: fjj34jdj add merge  
+  ```
+  现在,用`git status`查看工作区,就是干净的,因此可以放心地创建分支来修复bug.  
+  首先要确定要在那个分支上修复bug,假定需要在`master`分支上修复,就从`master`创建临时分支.`git checkout master`和`git checkout -b issue-101`.  
+  现在修补bug,然后提交`git add readme.txt`和`git commit -m 'fix bug 101'`,修复完成后,切换到`master`分支,并完成合并,最后删除`issue-101`分支.  
+  ```
+  $ git checkout master  
+  $ git merge --no-ff -m 'merged bug fix 101' issue-101  
+  ```
+  现在,bug修复完了,可以回到`dev`分支干活了.
+  ```
+  $ git checkout dev  
+  ```
+  通过`git status`命令查看工作区是干净的,刚才的工作现场存到哪里去了?用`git stash list`命令看看:  
+  ```
+  $ git stash list  
+  stash@{0}: WIP on dev: f52c633 add merge  
+  ```
+  工作现场还在,git把stash内容存在某个地方了,但是需要恢复一下,有两个办法:  
+  * 用`git stash apply`命令恢复,但是恢复后,stash内容并不删除,你需要用`git stash drop`命令来删除;  
+  * 用`git stash pop`命令,恢复的同时把stash内容也删除了.  
+  现在再使用`git stash list`查看,就看不到任何stash内容了.  
+  你可以多次stash,恢复的时候,先用`git stash list`查看,热庵后恢复指定的stash,用命令:  
+  ```
+  $ git stash apply stash@{0}  
+  ```
+## 小结  
+  修复bug时,我们会通过创建新的bug分支进行修复,然后合并,最后删除;  
+  当手头工作没有完成时,先把工作现场`git stash`一下,然后去修复bug,修复后,再`git stash pop`,回到工作现场.  
+
+## feature分支  
 
