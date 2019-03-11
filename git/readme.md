@@ -798,4 +798,85 @@
   * 命令`git push origin :refs/tags/<tagname>`可以删除一个远程标签.  
 
 ## 使用github  
+  * 在github上,可以任意fork开源仓库;  
+  * 自己拥有fork后的仓库的读写权限;  
+  * 可以推送pull request给官方仓库来贡献代码.  
+
+## 自定义git  
+  在安装git一节中,我们已经配置了`user.name`和`user.email`,实际上,git还有很多可配置项.  
+  比如,让Git显示颜色,会让命令输出看起来更醒目.  
+  ```
+  $ git config --global color.ui true  
+  ```
+  这样,git会适当地显示不同的颜色.  
+
+## 忽略特殊文件  
+  有些时候,你必须把某些文件放到git工作目录中,但又不能提交他们,比如保存了数据库密码的配置文件啦,等等.每次`git status`都会显示`untracked files ...`,有强迫症的童鞋心理肯定不爽.  
+
+  好在git考虑到了大家的感受,这个问题解决起来也很简单,在git工作区根目录下创建一个特殊的`.gitignore`文件,然后把要忽略的文件名填进去,git就会自动忽略这些文件.  
+  不需要从头写`.gitignore`文件,github已经为我们准备了各种配置文件,只需要组合一下就可以使用了.所有配置文件可以直接在线浏览:  
+  [https://github.com/github/gitignore](https://github.com/github/gitignore)  
+
+  忽略文件的原则是:  
+  1. 忽略操作系统自动生成的文件,比如缩略图等;  
+  2. 忽略编译生成的中间文件,可执行文件等,也就是如果一个文件是通过另一个文件自动生成的,那自动生成的文件就没必要放进版本库,比如java编译产生的`.class`文件;  
+  3. 忽略你自己打带敏感信息的配置文件,比如存放口令的配置文件.  
+
+  举个例子:
+  假设你在windows下进行python开发,Windows会自动在有图片的目录下生成隐藏的缩略图文件,如果有自定义目录,目录下就会有`desktop.ini`文件,因此你需要忽略Windows自动生成的垃圾文件:  
+  ```
+  # Windows:  
+  thumbs.db  
+  ehthumbs.db  
+  desktop.ini  
+  ```
+  然后,继续忽略python编译生成的`.pyc`,`.pyo`,`dist`等文件或目录:  
+  ```
+  # python:  
+  *.py[cod]  
+  *.so  
+  *.egg  
+  *.egg-info  
+  dist  
+  build  
+  ```
+  加上你自己定义的文件,最终得到一个完整的`.gitigrone`文件,内容如下:  
+  ```
+  # Windows:  
+  Thumbs.db  
+  ehthumbs.db  
+  Desktop.ini  
+
+  # Python:  
+  *.py[cod]  
+  *.so  
+  *.egg  
+  *.egg-info  
+  dist  
+  build  
+
+  # My configurations:  
+  db.ini  
+  deploy_key_rsa  
+  ```
+  最后一步就是把`.gitignore`也提交到git,就完成了.  
+  使用Windows的童鞋注意啦,如果你在资源管理器里新建一个`.gitignore`文件,它会非常弱智地提示你必须输入文件名,但是在文本编辑器里'保存'或者'另存为'就可以把文件保存为`.gitignore`了.  
+
+  有些时候,你想添加一个文件到git,但返现添加不了,原因是这个文件被`.gitignore`忽略了,如果你确实想添加该文件,可以用`-f`强制添加到git:  
+  ```
+  $ git add -f app.class  
+  ```
+  或者你发现,可能是`.gitignore`写的有问题,需要找出来那个规则写错了,可以用`git check-ignore`命令检查:  
+  ```
+  $ git check-ignore -v app.class  
+  .gitignore:3:*.class    app.class  
+  ```
+  git会告诉我们,`.gitignore`的第3行规则忽略了该文件,于是我们就知道应该修改那个规则.  
+
+## 小结  
+  * 忽略某些文件时,需要编写`.gitignore`;  
+  * `.gitignore`文件本身要放到版本库里,并且可以对`.gitignore`做版本管理!  
+
+## 配置别名  
+
 
