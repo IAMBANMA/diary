@@ -777,7 +777,7 @@
   $ git push origin v1.0  
   total 0 (delta 0), reused 0 (delta 0)  
   to github.com:IAMBANMA/git.git  
-   \* [new tag]        v1.0 -> v1.0  
+   * [new tag]        v1.0 -> v1.0  
   ```
   或者,一次性推送全部尚未推送到远程的本地标签:  
   ```
