@@ -878,5 +878,97 @@
   * `.gitignore`文件本身要放到版本库里,并且可以对`.gitignore`做版本管理!  
 
 ## 配置别名  
+  有没有经常敲错命令,比如`git status`?`status`这个单词真心不好记.  
+  如果敲`git st`就表示`git status`那就简单多了,当然这种偷懒的办法是有的.  
+  我们只需要敲一行命令,告诉git,以后`st`就表示`status`:  
+  ```
+  $ git config --global alias.st status  
+  ```
+  `--global`参数是全局参数,也就是这些命令在这台电脑的所有git仓库下都有用.  
 
+## 配置文件  
+  在配置git的时候,加上`--global`是针对当前用户起作用的,如果不加,那只针对当前仓库起作用.  
+  配置文件放哪了?每个仓库的配置文件都放在`.git/config`文件中:  
+  ```
+  $ cat .git/config  
+  [core]  
+      repositoryformatversion = 0  
+      filemode = true  
+      bare = false  
+      logallrefupdates = true  
+      ignorecase = true  
+      precomposeunicode = true  
+  [remote 'origin'] 
+      url = git@github.com:iambanma/git.git  
+      fetch = +refs/heads/*:refs/remotes/origin/*  
+  [branch 'master']  
+      romote = origin  
+      merge = refs/heads/master  
+  [alias]  
+      st = status  
+  ```
+  别名就在`[alias]`后面,要删除别名,直接把对应的行删掉即可.  
+  而当前用户的git配置文件放在用户主目录下的一个隐藏文件`.gitconfig`中:  
+  ```
+  $ cat .gitconfig  
+  [alias]  
+      st = status  
+  [user]  
+      name = your name  
+      email = your@email.com  
+  ```
+  配置别名也可以直接修改这个文件,如果改错了,可以删掉文件重新通过命令配置.  
+
+## 搭建git服务器  
+  在远程仓库一节中,我们讲了远程仓库实际上和本地仓库没啥不同,纯粹为了7*24开机并交换大家的修改.  
+  github就是一个免费托管开源代码的远程仓库.但是对于某些视源代码如生命的公司来说,既不想公开源代码,又舍不得给github交保护费,那就只能自己搭建一台git服务器作为私有仓库使用.  
+  搭建git服务器需要准备一台运行linux的机器,这样,通过几条简单的`apt`命令就可以完成安装.  
+  假设你已经有`sudo`权限的账号,下面正式开始安装.  
+  第一步,安装`git`:  
+  ```
+  $ sudo apt-get install git  
+  ```
+  第二步,创建一个`git`用户,用来运行`git`服务:  
+  ```
+  $ sudo adduser git  
+  ```
+  第三步,创建证书登录:  
+  收集所有需要登录的用户的公钥,就是他们自己的`id_rsa.pub`文件,把所有公钥导入到`/home/git/.ssh/authorized_keys`文件里,一行一个.  
+  第四步,初始化git仓库:  
+  先选定一个目录作为git仓库,假定是`/srv/sample.git`在`/srv`目录下输入命令:  
+  ```
+  $ sudo git init --bare sample.git   
+  ```
+  git就会创建一个裸仓库,裸仓库没有工作区,因为服务器上的git仓库纯粹是为了共享,所以不让用户直接登录到服务器上去改工作区,并且服务器上的git仓库通常都以`.git`结尾.然后,把owner改为`git`:  
+  ```
+  $ sudo chown -R git:git sample.git  
+  ```
+  第五步,禁用shell登录:  
+  处于安全考虑,第二步创建的git用户不允许登录shell,这可以通过编辑`/etc/passwd`文件完成.找到类似下面一行:  
+  ```
+  git:x:1001:1001:,,,:/home/git:/bin/bash  
+  ```
+  改为:  
+  ```
+  git:x:1001:1001:,,,:/home/git:/usr/bin/git-shell  
+  ```
+  这样,`git`用户可以正常通过ssh使用git,但无法登录shell,因为我们为`git`用户指定的`git-shell`每次一登录就自动退出.  
+  第六步,克隆远程仓库:  
+  现在.可以通过`git clone`命令克隆远程仓库啦,在各自的电脑上运行:  
+  ```
+  $ git clone git@server:/srv/sample.git  
+  cloning into 'sample'...  
+  warning: yuo appear to have cloned an empty repository  
+  ```
+  剩下的推送就简单了.  
+
+## 管理公钥  
+  如果团队很小,把每个人的公钥收集起来放到服务器的`/home/git/.ssh/authorized_keys`文件里就是可行的.如果团队有几百号人,就不能这么玩了,这时,可以用[gitosis](https://github.com/res0nat0r/gitosis)来管理公钥.  
+
+## 管理权限  
+  有很多不但视源代码如生命,而且视员工为窃贼的公司,会在版本控制系统里设置一套完善的权限控制,每个人是否有读写权限会精确到每个分支甚至每个目录下.因为git是为linux源代码托管开发的,所以Git也继承了开源社区的精神,不支持权限控制.不过,因为git支持钩子(hook),所以,可以在服务器端写一系列脚本来控制提交等操作,达到权限控制的目的.[gitolite](https://github.com/sitaramc/gitolite)就是这个工具.  
+
+
+
+# *全章结束*
 
