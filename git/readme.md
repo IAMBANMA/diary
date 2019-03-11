@@ -725,44 +725,44 @@
   "请把上周一那个版本打包发布,版本号是v1.2"  
   所以,tag就是一个让人容易记住的有意义的名字,它跟某个commit绑在一起.  
 ## 创建标签   
-   在git中打标签非常简单,首先,切换到需要打标签的分支上:  
-    ```
-    $ git branch  
-    *dev  
-     master 
-    $ git checkout master  
-    switched to branch 'master'  
-    ```
-    然后,敲命令`git tag <name>`就可以打一个新的标签:  
-    ```
-    $ git tag v1.0  
-    ```
-    可以用命令`git tag`查看所有标签:  
-    ```
-    $ git tag  
-    v1.0  
-    ```
-    默认标签是打在最新提交的commit上的,有时候,如果忘了打标签,比如,现在已经是周五啦,但应该在周一打的标签没有打,怎么办?  
-    方法是找到历史提交的commit id,然后打上就可以了.  
-    ```
-    $ git tag v0.9 f52c633  
-    ```
-    再用命令`git tag`查看标签:  
-    ```
-    $ git tag  
-    v0.9  
-    v1.0  
-    ```
-    注意,标签不是按时间顺序列出的,而是按字母排序的.可以用`git show <tagname>`查看标签信息.  
-    还可以创建带有说明的标签,用`-a`指定标签名,`-m`指定说明文字:  
-    ```
-    $ git tag -a v0.1 -m 'version 0.1 released' 1096sdkd  
-    ```
-    **注意: 标签总是和某个commit挂钩.如果这个commit既出现在master分支,又出现在dev分支,那么在这两个分支上都可以看到这个标签.**  
+  在git中打标签非常简单,首先,切换到需要打标签的分支上:  
+  ```
+  $ git branch  
+  *dev  
+   master 
+  $ git checkout master  
+  switched to branch 'master'  
+  ```
+  然后,敲命令`git tag <name>`就可以打一个新的标签:  
+  ```
+  $ git tag v1.0  
+  ```
+  可以用命令`git tag`查看所有标签:  
+  ```
+  $ git tag  
+  v1.0  
+  ```
+  默认标签是打在最新提交的commit上的,有时候,如果忘了打标签,比如,现在已经是周五啦,但应该在周一打的标签没有打,怎么办?  
+  方法是找到历史提交的commit id,然后打上就可以了.  
+  ```
+  $ git tag v0.9 f52c633  
+  ```
+  再用命令`git tag`查看标签:  
+  ```
+  $ git tag  
+  v0.9  
+  v1.0  
+  ```
+  注意,标签不是按时间顺序列出的,而是按字母排序的.可以用`git show <tagname>`查看标签信息.  
+  还可以创建带有说明的标签,用`-a`指定标签名,`-m`指定说明文字:  
+  ```
+  $ git tag -a v0.1 -m 'version 0.1 released' 1096sdkd  
+  ```
+  **注意: 标签总是和某个commit挂钩.如果这个commit既出现在master分支,又出现在dev分支,那么在这两个分支上都可以看到这个标签.**  
 
 ## 小结  
-    * 命令`git tag <tagname>`用于创建一个标签,默认为`HEAD`,也可以指定一个commit id;  
-    * 命令`git tag -a <tagname> -m "blablabla..."`可以指定标签信息;  
-    * 命令`git tag`可以查看所有标签.  
+  * 命令`git tag <tagname>`用于创建一个标签,默认为`HEAD`,也可以指定一个commit id;  
+  * 命令`git tag -a <tagname> -m "blablabla..."`可以指定标签信息;  
+  * 命令`git tag`可以查看所有标签.  
 
 
